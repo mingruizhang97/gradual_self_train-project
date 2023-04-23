@@ -7,11 +7,13 @@ We prove the first non-vacuous upper bound on the error of self-training with gr
 # 1. Overview
 
 ## What is Domain Adaptation?
+**Domain adaptation** is the ability to apply an algorithm trained in one or more "source domains" to a different but related "target domain". It generally seeks to learn a model from a source labeled data that can be generalized to a target domain by minimizing the difference between domain distributions. 
 
+Domain adaptation is a special case of transfer learning. Transfer learning refers to a class of machine learning problems where either the tasks and/or domains may change between source and target while in domain adaptations only domains differ and tasks remain unchanged.[1]
 ## What is Self-training?
-
+**Self-training**, which is also known as self-learning, self-labeling, or decision-directed learning, is probably the earliest idea about using unlabeled data in classification. This is a wrapper-algorithm that repeatedly uses a supervised learning method. It starts by training on the labeled data only. In each step, a part of the unlabeled points is labeled as "pseudolabel" according to the current decision function; then the supervised method is retrained using the previous predictions(pseudolabeled samples)which have been classified with confidence as additional labeled points.[2]
 ## Motivation on Self-training for Gradual Domain Adaptation
-
+Traditional machine learning aims to learn a model on a set of training samples to find an objective function with minimum risk on unseen test data. However, it assumes that both training and test data are drawn from the same distribution and share similar joint probability distributions. This assumption can be easily violated in the real-world applications.
 # 2. Theoretical Findings
 ## Problem Setup
 ## Essential Findings
@@ -22,6 +24,9 @@ We prove the first non-vacuous upper bound on the error of self-training with gr
 # 4. Discussion
 # 5. Conclusion
 # 6. Reference
+[1] arXiv:2010.03978:[https://doi.org/10.48550/arXiv.2010.03978](https://doi.org/10.48550/arXiv.2010.03978)
+
+[2] O. Chapelle, A. Zien, and B. Scholkopf. Semi-Supervised Learning. MIT Press, 2006.
 
 ## Create files and folders
 
