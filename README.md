@@ -24,6 +24,13 @@ Traditional machine learning aims to learn a model on a set of training samples 
 - Distributions: There are joint distributions over the inputs and labels, $R^{D} \times \lbrace -1,1 \rbrace : P_0,P_1,...,P_T$, where $P_0$ is the source domain, $P_T$ is the target domain, and $P_1,...,P_{T-1}$ are intermediate domains.
 - Shift is gradual: Define $\rho(P,Q)$ as a distance function between distributions $P$ and $Q$. Assume that for some $\epsilon > 0$, $\rho (P_t,P_{t+1}) < \epsilon$ for all $0 \leq t \leq T$.
 - Samples: There are $n_0$ labeled examples $S_0 = \lbrace x_i^{(0)}, y_i^{(0)} \rbrace_{i=1}^{n_0}$  sampled independently from the source $P_0$ and $n$ unlabeled examples $S_t = \lbrace x_i^{(t)} \rbrace_{i=1}^{n}$ sampled independently from $P_t$ for each $1 \leq t \leq T$.
+
+**Models and objectives:**
+- Model definition: We have a model family $\Theta$, where a model $M_{\theta}: R^d ->R$ outputs a score representing its confidence that the label $y$ is $1$ for the given example.
+- Model prediction: Assume $sign(M_{\theta}(x))$ is the predict function for an input $x$, where $sign(r) = 1$ if $r\geq 0$ and $sign(r) = -1$ if $r < 0$.
+- Model evaluation: Use 0-1 loss as the evaluation metric which evaluates models on the fraction of times they make a wrong prediction.
+$$Err(\theta,P) = \underset{X,Y \sim P}{\mathbb{E}} [sign(M_{\theta}(X)\neq Y)]$$
+The goal for the problem is to find a classifier $\theta$ that gets high accuracy on the target domain $P_T$—— that is, low $Err(\theta,P_T)$.
 ## Assumption
 ## Essential Findings
 
