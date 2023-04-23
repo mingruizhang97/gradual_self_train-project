@@ -18,7 +18,13 @@ Domain adaptation is a special case of transfer learning. Transfer learning refe
 ## Motivation on Self-training for Gradual Domain Adaptation
 Traditional machine learning aims to learn a model on a set of training samples to find an objective function with minimum risk on unseen test data. However, it assumes that both training and test data are drawn from the same distribution and share similar joint probability distributions. This assumption can be easily violated in the real-world applications.
 # 2. Theoretical Findings
-## Problem Setup
+## Problem General Setup
+**Gradually shifting distributions:**
+- Task: Consider a binary classification task of predicting labels $y \in \{-1,1\}$ from input features $x \in R^{d}$. 
+- Distributions: There are joint distributions over the inputs and labels, $R^{D} \times \{-1,1\} : P_0,P_1,...,P_T$, where $P_0$ is the source domain, $P_T$ is the target domain, and $P_1,...,P_{T-1}$ are intermediate domains.
+- Shift is gradual: Define $\rho(P,Q)$ as a distance function between distributions $P$ and $Q$. Assume that for some $\epsilon > 0$, $\rho (P_t,P_{t+1}) < \epsilon$ for all $0 \leq t \leq T$.
+- Samples: There are $n_0$ labeled examples $S_0 = \{x_i^{(0)}, y_i^{(0)}\}_{i=1}^{n_0}$ sampled independently from the source $P_0$ and $n$ unlabeled examples $S_t = \{x_i^{(t)}\}_{i=1}^{n}$ sampled independently from $P_t$ for each $1 \leq t \leq T$.
+## Assumption
 ## Essential Findings
 
 # 3. Experiments
