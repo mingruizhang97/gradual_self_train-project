@@ -35,9 +35,14 @@ The goal for the problem is to find a classifier $\theta$ that gets high accurac
 $$\theta_0=\underset{\theta^{'} \in \Theta}{argmin \frac{1}{n_0}} \sum_{(x_i,y_i)\in S_0}^n l(M_{\theta^{'}}(x_i),y_i)$$
 - Self-training: Use unlabeled data to adapt a model. Given a model $\theta$ and unlabeled data $S$, $ST(\theta, S)$ denotes the output of self-training. Self-training pseudolabels each example in $S$ using $M_{\theta}$, and then selects a new model $\theta^{'}$ that minimizes the loss on this pseudolabeled dataset. Formally,
 $$ST(\theta, S) = \underset{\theta^{'} \in \Theta}{argmin \frac{1}{|S|}} \sum_{(x_i)\in S}^n l(M_{\theta^{'}}(x_i),sign(M_{\theta}(x_i)))$$
-
+The behavior of self-training when run on infinite unlabeled data from a probability distribution $P$ can be described as 
+$$ST(\theta, S) = \underset{\theta^{'} \in \Theta}{argmin} \underset{X \sim P}{\mathbb{E}} [l(M_{\theta^{'}}(X),sign(M_{\theta}(X)))]$$
 **Baseline methods:**
 - Non-adaptive baseline: Directly use $\theta_0$ on the target domain. It will incur error $Err(\theta_0, P_T)$.
+- Direct adaptation to target baseline: Take the source model $\theta_0$ and self-trains on the target data $S_T$, and is denoted by $ST(\theta_0, S_T)$.
+- Gradual self-training: In gradual self-training, we self-train on the finite unlabeled examples from each domain successively. That is, for $i\geq 1$, we set:
+$$\theta_i = ST(\theta_{i-1},S_i)$$
+$ST(\theta_0,(S_1,...,S_Y)) = \theta_T$ is the output of gradual self-training, which we evaluate on the target distribution $P_T$.
 ## Assumption
 ## Essential Findings
 
