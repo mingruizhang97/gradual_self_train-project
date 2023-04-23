@@ -20,10 +20,10 @@ Traditional machine learning aims to learn a model on a set of training samples 
 # 2. Theoretical Findings
 ## Problem General Setup
 **Gradually shifting distributions:**
-- Task: Consider a binary classification task of predicting labels $y \in \{-1,1\}$ from input features $x \in R^{d}$. 
-- Distributions: There are joint distributions over the inputs and labels, $R^{D} \times \{-1,1\} : P_0,P_1,...,P_T$, where $P_0$ is the source domain, $P_T$ is the target domain, and $P_1,...,P_{T-1}$ are intermediate domains.
+- Task: Consider a binary classification task of predicting labels $y \in \lbrace -1,1 \rbrace$ from input features $x \in R^{d}$. 
+- Distributions: There are joint distributions over the inputs and labels, $R^{D} \times \lbrace -1,1 \rbrace : P_0,P_1,...,P_T$, where $P_0$ is the source domain, $P_T$ is the target domain, and $P_1,...,P_{T-1}$ are intermediate domains.
 - Shift is gradual: Define $\rho(P,Q)$ as a distance function between distributions $P$ and $Q$. Assume that for some $\epsilon > 0$, $\rho (P_t,P_{t+1}) < \epsilon$ for all $0 \leq t \leq T$.
-- Samples: There are $n_0$ labeled examples $S_0 = \{x_i^{(0)}, y_i^{(0)}\}_{i=1}^{n_0}$ sampled independently from the source $P_0$ and $n$ unlabeled examples $S_t = \{x_i^{(t)}\}_{i=1}^{n}$ sampled independently from $P_t$ for each $1 \leq t \leq T$.
+- Samples: There are $n_0$ labeled examples $S_0 = \lbrace x_i^{(0)}, y_i^{(0)} \rbrace_{i=1}^{n_0}$  sampled independently from the source $P_0$ and $n$ unlabeled examples $S_t = \lbrace x_i^{(t)} \rbrace_{i=1}^{n}$ sampled independently from $P_t$ for each $1 \leq t \leq T$.
 ## Assumption
 ## Essential Findings
 
