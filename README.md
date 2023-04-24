@@ -53,7 +53,8 @@ $ST(\theta_0,(S_1,...,S_Y)) = \theta_T$ is the output of gradual self-training, 
 ## Assumption
 - **Models:** Consider regularized linear models that have weights with bounded $l_2$ norm: $\Theta_R = (w,b):\lbrace w\in R^{d} , b\in R , \lVert w \rVert_2 \leq R \rbrace$ for some fixed $R > 0$. Given $(w,b) \in \Theta_R$, the model's output is $M_{w,b}(x) = w^T x+b$.
 - **Margin loss function:**  A margin loss encourages a model to classify points correctly and confidently by keeping correctly classified points far from the decision boundary. Consider the hinge loss $h$ and ramp loss $r$:
-$$h(m) = max(1-m,0)$$$$r(m) = min(h(m),1)$$
+$$h(m) = max(1-m,0)$$
+$$r(m) = min(h(m),1)$$
 In our experiment, we take ramp loss as the loss function: $l_r (\hat{y},y)=r(y\hat{y})$, where $\hat{y} \in R$ is a model's prediction, and $y\in \lbrace -1,1\rbrace$ is the true label. We denote the population ramp loss as:
 $$L_r(\theta,P) = \underset{X,Y \sim P}{\mathbb{E}}[l_r(M_{\theta}(X),Y)]$$
 Given a finite sample $S$, the empirical loss is:
