@@ -13,8 +13,10 @@ We prove the first non-vacuous upper bound on the error of self-training with gr
 **Domain adaptation** is the ability to apply an algorithm trained in one or more "source domains" to a different but related "target domain". It generally seeks to learn a model from a source labeled data that can be generalized to a target domain by minimizing the difference between domain distributions. 
 
 Domain adaptation is a special case of transfer learning. Transfer learning refers to a class of machine learning problems where either the tasks and/or domains may change between source and target while in domain adaptations only domains differ and tasks remain unchanged.[1]
+<p align="center">
+<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/domain_adaptation%20graph.jpg" width = '400' height = '300'>
+</p>
 
-<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/domain_adaptation%20graph.jpg">
 
 ## What is Self-training?
 **Self-training**, which is also known as self-learning, self-labeling, or decision-directed learning, is probably the earliest idea about using unlabeled data in classification. This is a wrapper-algorithm that repeatedly uses a supervised learning method. It starts by training on the labeled data only. In each step, a part of the unlabeled points is labeled as "pseudolabel" according to the current decision function; then the supervised method is retrained using the previous predictions(pseudolabeled samples)which have been classified with confidence as additional labeled points.[2]
@@ -73,23 +75,29 @@ $$L_r(\theta^{'},Q) \leq \frac{2}{1-\rho R}L_r(\theta,P)+\alpha^{\*}+\frac{4BR+\
 - **Rotating MNIST:** Rotating MNIST is a semi-synthetic dataset where we rotate each MNIST image by an angle between $0$ and $60$ degrees. We split the $50,000$ MNIST training set images into a source domain (images rotated between $0$ and $5$ degrees), intermediate domain (rotations between $5$ and $60$ degrees), and a target domain (rotations between $55$ degrees and $60$ degrees). Note that each image is seen at exactly one angle, so the training procedure cannot track a single image across different angles.
 - **Portraits:** A real dataset comprising photos of high school seniors across years. The model’s goal is to classify gender. We split the data into a source domain (first 2000 images), intermediate domain (next 14000 images), and target domain (next 2000 images).
 ## Results
+Models are evaluated on **classification accuracy**.
 ### Results on different self-training methods
-<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/Picture1.png">
-
+<p align="center">
+<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/Picture1.png" width = '500' height = '150'>
+</p>
 - **Source:** simply train a classifier on the labeled source examples. 
 - **Target self-train:** repeatedly self-train on the unlabeled target examples ignoring the intermediate examples.
 - **All self-train:** pool all the unlabeled examples from the intermediate and target domains, and repeatedly self-train on this pooled dataset to adapt the initial source classifier.
 - **Gradual self-train:** sequentially use self-training on unlabeled data in each successive intermediate domain, and finally self-train on unlabeled data on the target domain, to adapt the initial source classifier.
 
 ### Results on different label and regularization methods
-<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/Picture2.png">
+<p align="center">
+<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/Picture2.png" width = '500' height = '150'>
+</p>
 
 - **Soft Labels:** With regularization but with soft labels
 - **Gradual ST:** Explicit regularization and hard labels
 - **No Reg:** Without regularization but with hard labels 
 ### Results on different number of samples
 
-<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/Picture3.png">
+<p align="center">
+<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/Picture3.png" width = '500' height = '150'>
+</p>
 
 - Dataset: a rotating MNIST dataset where we increase the sample sizes. The source domain $P_0$ consists of $N \in \lbrace2000, 5000, 20000 \rbrace$ images on MNIST. $P_t$ then consists of these same $N$ images, rotated by angle $3t$, for $0\leq t \leq 20$. 
 The goal is to get high accuracy on $P_{20}$: these images rotated by $60$ degrees—the model doesn’t have to generalize to unseen images, but to seen images at different angles.
