@@ -1,6 +1,7 @@
 
 
 
+
 # Summary of Understanding Self-Training for Gradual Domain Adaptation
 
 Machine learning systems must adapt to data distributions that evolve over time, in applications ranging from sensor networks and self-driving car perception modules to brain-machine interfaces. We consider gradual domain adaptation, where the goal is to adapt an initial classifier trained on a source domain given only unlabeled data that shifts gradually in distribution towards a target domain. 
@@ -80,6 +81,7 @@ Models are evaluated on **classification accuracy**.
 <p align="center">
 <img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/Picture1.png" width = '500' height = '150'>
 </p>
+
 - **Source:** simply train a classifier on the labeled source examples. 
 - **Target self-train:** repeatedly self-train on the unlabeled target examples ignoring the intermediate examples.
 - **All self-train:** pool all the unlabeled examples from the intermediate and target domains, and repeatedly self-train on this pooled dataset to adapt the initial source classifier.
