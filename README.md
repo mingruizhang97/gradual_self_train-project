@@ -73,7 +73,19 @@ $$L_r(\theta^{'},Q) \leq \frac{2}{1-\rho R}L_r(\theta,P)+\alpha^{\*}+\frac{4BR+\
 - **Rotating MNIST:** Rotating MNIST is a semi-synthetic dataset where we rotate each MNIST image by an angle between $0$ and $60$ degrees. We split the $50,000$ MNIST training set images into a source domain (images rotated between $0$ and $5$ degrees), intermediate domain (rotations between $5$ and $60$ degrees), and a target domain (rotations between $55$ degrees and $60$ degrees). Note that each image is seen at exactly one angle, so the training procedure cannot track a single image across different angles.
 - **Portraits:** A real dataset comprising photos of high school seniors across years. The model’s goal is to classify gender. We split the data into a source domain (first 2000 images), intermediate domain (next 14000 images), and target domain (next 2000 images).
 ## Results
+### Results on different self-training methods
+- **Source:** simply train a classifier on the labeled source examples. 
+- **Target self-train:** repeatedly self-train on the unlabeled target examples ignoring the intermediate examples.
+- **All self-train:** pool all the unlabeled examples from the intermediate and target domains, and repeatedly self-train on this pooled dataset to adapt the initial source classifier.
+- **Gradual self-train:** sequentially use self-training on unlabeled data in each successive intermediate domain, and finally self-train on unlabeled data on the target domain, to adapt the initial source classifier.
 
+### Results on different label and regularization methods
+- **Soft Labels:** With regularization but with soft labels
+- **Gradual ST:** Explicit regularization and hard labels
+- **No Reg:** Without regularization but with hard labels 
+### Results on different number of samples
+- Dataset: a rotating MNIST dataset where we increase the sample sizes. The source domain $P_0$ consists of $N \in \lbrace2000, 5000, 20000 \rbrace$ images on MNIST. $P_t$ then consists of these same $N$ images, rotated by angle $3t$, for $0\leq t \leq 20$. 
+The goal is to get high accuracy on $P_{20}$: these images rotated by $60$ degrees—the model doesn’t have to generalize to unseen images, but to seen images at different angles.
 # 4. Discussion
 # 5. Conclusion
 # 6. Reference
