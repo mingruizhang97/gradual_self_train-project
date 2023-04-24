@@ -67,12 +67,20 @@ $$\rho(P,Q) = max(W_{\infty}(P_{X|Y=1},Q_{X|Y=1}), W_{\infty}(P_{X|Y=-1},Q_{X|Y=
 - **No label shift assumption:** Assume that the fraction of $Y=1$ labels does not change:$P_t(Y)$ is the same for all $t$.
 ## Essential Findings
 ### **Direct adaptation baseline fails:**
-Even under that $\alpha^{\*}$-separation, no label shift, gradual shift, and bounded data assumptions, there exists distributions $P_0,P_1,P_2$ and a source model $\theta \in \Theta_R$ that get $0$ loss on the source $(L_r(\theta,P_0)=0)$, but high loss on the target: $L_r(\theta,P_2) = 1$. Self-training directly on the target does not help: $L_r(ST(\theta,P_2),P_2) = 1$. This holds true even if every domain is separable, so $\alpha^{\*} = 0$ .
+Direct adaptation baseline may get high ramp loss on the target domain even if it gets $0$ ramp loss on the source domain. It is because the distribution shift from source $P_0$ to the target $P_T$ can be large though the distribution shift from $P_t$ to $P_{t+1}$ is small. Formally:
+
+Even under that $\alpha^{\*}$-separation, no label shift, gradual shift, and bounded data assumptions, there exists distributions $P_0,P_1,P_2$ and a source model $\theta \in \Theta_R$ that get $0$ loss on the source $(L_r(\theta,P_0)=0)$, but high loss on the target: $L_r(\theta,P_2) = 1$. Self-training directly on the target does not help: $L_r(ST(\theta,P_2),P_2) = 1$. This holds true even if every domain is separable, so $\alpha^{\*} = 0$.
+
 ### **Gradual self-training improves error:** 
+- From this paper, they find out that the empirical ramp loss of the current pseudolabeled dataset has a upper bound through gradual self-training process. It means that if we have a model $\theta$ that gets low loss and the distribution shifts slightly, self-training gives us a model $\theta_{'}$ that does not do too badly on the new distribution. Formally:
 Given $P,Q$ with $\rho(P,Q) = \rho < \frac{1}{R}$ and marginals on $Y$ are the same so $P(Y) = Q(Y)$. Suppose $P,Q$ satisfy the bounded data assumption, and we have initial model $\theta$, and $n$ unlabeled samples $S$ from $Q$, and we set $\theta^{'}= ST(\theta,S)$. Then with probability at least $1-\delta$ over the sampling of $S$, letting $\alpha^{\*} = min_{\theta^{\*} \in \Theta_R} L_r(\theta^{\*},Q)$:
 $$L_r(\theta^{'},Q) \leq \frac{2}{1-\rho R}L_r(\theta,P)+\alpha^{\*}+\frac{4BR+\sqrt{2\log2/\delta}}{\sqrt{n}}$$
+
+- After $T$ time steps, the error of gradual self-training is $\lesssim \exp(cT)\alpha_0$ for some constant $c$, if the originial error is $\alpha_0$. It means that this gradual structure allows some control of the error unlike direct adaptation where the accuracy on the target domain can be $0%$ if $T \geq 2$. Formally:
 Under the $\alpha^{\*}$-separation, no label shift, gradual shift, and bounded data assumptions, if the source model $\theta_0$ has low loss $\alpha_0 \geq \alpha^{\*}$ on $P_0$ and $\theta$ is the result of gradual self-training: $\theta = ST(\theta_0,(S_1,...,S_n))$, letting $\beta = \frac{2}{1-\rho R}$:
 $$L_r(\theta,P_T) \leq \beta^{T+1}(\alpha_0+\frac{4BR+\sqrt{2\log2T/\delta}}{\sqrt{n}})$$ 
+
+- Gradual self-training in this setting is tight even with infinite unlabeled examples. The error still has an exponential growth under this case. Formally:
 Even under the $\alpha^{\*}$-separation, no label shift, gradual shift, and bounded data assumptions, given $0 \leq \alpha_0 \leq \frac{1}{4}$, for every $T$ there exists distributions $P_0,..., P_{2T}$, and $\theta_0 \in \Theta_R$ with $L_r(\theta_0,P_0) \leq \alpha^{\*}$, but if $\theta^{'} = ST(\theta_0,(P1,...,P_{2T}))$ then $L_r(\theta^{'},P_{2T}) \geq min(0.5, \frac{1}{2}2^T \alpha_0)$. Note that $L_r$ is always in $[0,1]$.
 
 ### **Essential ingredients for gradual self-training:**
