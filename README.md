@@ -74,16 +74,23 @@ $$L_r(\theta^{'},Q) \leq \frac{2}{1-\rho R}L_r(\theta,P)+\alpha^{\*}+\frac{4BR+\
 - **Portraits:** A real dataset comprising photos of high school seniors across years. The model’s goal is to classify gender. We split the data into a source domain (first 2000 images), intermediate domain (next 14000 images), and target domain (next 2000 images).
 ## Results
 ### Results on different self-training methods
+<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/Picture1.png">
+
 - **Source:** simply train a classifier on the labeled source examples. 
 - **Target self-train:** repeatedly self-train on the unlabeled target examples ignoring the intermediate examples.
 - **All self-train:** pool all the unlabeled examples from the intermediate and target domains, and repeatedly self-train on this pooled dataset to adapt the initial source classifier.
 - **Gradual self-train:** sequentially use self-training on unlabeled data in each successive intermediate domain, and finally self-train on unlabeled data on the target domain, to adapt the initial source classifier.
 
 ### Results on different label and regularization methods
+<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/Picture2.png">
+
 - **Soft Labels:** With regularization but with soft labels
 - **Gradual ST:** Explicit regularization and hard labels
 - **No Reg:** Without regularization but with hard labels 
 ### Results on different number of samples
+
+<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/Picture3.png">
+
 - Dataset: a rotating MNIST dataset where we increase the sample sizes. The source domain $P_0$ consists of $N \in \lbrace2000, 5000, 20000 \rbrace$ images on MNIST. $P_t$ then consists of these same $N$ images, rotated by angle $3t$, for $0\leq t \leq 20$. 
 The goal is to get high accuracy on $P_{20}$: these images rotated by $60$ degrees—the model doesn’t have to generalize to unseen images, but to seen images at different angles.
 # 4. Discussion
