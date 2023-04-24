@@ -1,3 +1,6 @@
+
+
+
 # Summary of Understanding Self-Training for Gradual Domain Adaptation
 
 Machine learning systems must adapt to data distributions that evolve over time, in applications ranging from sensor networks and self-driving car perception modules to brain-machine interfaces. We consider gradual domain adaptation, where the goal is to adapt an initial classifier trained on a source domain given only unlabeled data that shifts gradually in distribution towards a target domain. 
@@ -10,17 +13,67 @@ We prove the first non-vacuous upper bound on the error of self-training with gr
 **Domain adaptation** is the ability to apply an algorithm trained in one or more "source domains" to a different but related "target domain". It generally seeks to learn a model from a source labeled data that can be generalized to a target domain by minimizing the difference between domain distributions. 
 
 Domain adaptation is a special case of transfer learning. Transfer learning refers to a class of machine learning problems where either the tasks and/or domains may change between source and target while in domain adaptations only domains differ and tasks remain unchanged.[1]
+
+<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/domain_adaptation%20graph.jpg">
+
 ## What is Self-training?
 **Self-training**, which is also known as self-learning, self-labeling, or decision-directed learning, is probably the earliest idea about using unlabeled data in classification. This is a wrapper-algorithm that repeatedly uses a supervised learning method. It starts by training on the labeled data only. In each step, a part of the unlabeled points is labeled as "pseudolabel" according to the current decision function; then the supervised method is retrained using the previous predictions(pseudolabeled samples)which have been classified with confidence as additional labeled points.[2]
 ## Motivation on Self-training for Gradual Domain Adaptation
 Traditional machine learning aims to learn a model on a set of training samples to find an objective function with minimum risk on unseen test data. However, it assumes that both training and test data are drawn from the same distribution and share similar joint probability distributions. This assumption can be easily violated in the real-world applications.
-# 2. Theoretical Findings
-## Problem Setup
+# 2. Theoretical Analysis
+## Problem General Setup
+**Gradually shifting distributions:**
+- Task: Consider a binary classification task of predicting labels $y \in \lbrace -1,1 \rbrace$ from input features $x \in R^{d}$. 
+- Distributions: There are joint distributions over the inputs and labels, $R^{D} \times \lbrace -1,1 \rbrace : P_0,P_1,...,P_T$, where $P_0$ is the source domain, $P_T$ is the target domain, and $P_1,...,P_{T-1}$ are intermediate domains.
+- Shift is gradual: Define $\rho(P,Q)$ as a distance function between distributions $P$ and $Q$. Assume that for some $\epsilon > 0$, $\rho (P_t,P_{t+1}) < \epsilon$ for all $0 \leq t \leq T$.
+- Samples: There are $n_0$ labeled examples $S_0 = \lbrace x_i^{(0)}, y_i^{(0)} \rbrace_{i=1}^{n_0}$  sampled independently from the source $P_0$ and $n$ unlabeled examples $S_t = \lbrace x_i^{(t)} \rbrace_{i=1}^{n}$ sampled independently from $P_t$ for each $1 \leq t \leq T$.
+
+**Models and objectives:**
+- Model definition: We have a model family $\Theta$, where a model $M_{\theta}: R^d ->R$ outputs a score representing its confidence that the label $y$ is $1$ for the given example.
+- Model prediction: Assume $sign(M_{\theta}(x))$ is the predict function for an input $x$, where $sign(r) = 1$ if $r\geq 0$ and $sign(r) = -1$ if $r < 0$.
+- Model evaluation: Use 0-1 loss as the evaluation metric which evaluates models on the fraction of times they make a wrong prediction.
+$$Err(\theta,P) = \underset{X,Y \sim P}{\mathbb{E}} [sign(M_{\theta}(X)\neq Y)]$$
+The goal for the problem is to find a classifier $\theta$ that gets high accuracy on the target domain $P_T$—— that is, low $Err(\theta, P_T)$.
+- Loss function: Select a loss function $l: R\times \lbrace-1,1\rbrace -> R^+$ which takes a prediction and label, and outputs a non-negative loss value, and we begin by training a source model $\theta_0$ that minimizes the loss on labeled data in the source domain:
+$$\theta_0=\underset{\theta^{'} \in \Theta}{argmin \frac{1}{n_0}} \sum_{(x_i,y_i)\in S_0}^n l(M_{\theta^{'}}(x_i),y_i)$$
+- Self-training: Use unlabeled data to adapt a model. Given a model $\theta$ and unlabeled data $S$, $ST(\theta, S)$ denotes the output of self-training. Self-training pseudolabels each example in $S$ using $M_{\theta}$, and then selects a new model $\theta^{'}$ that minimizes the loss on this pseudolabeled dataset. Formally,
+$$ST(\theta, S) = \underset{\theta^{'} \in \Theta}{argmin \frac{1}{|S|}} \sum_{(x_i)\in S}^n l(M_{\theta^{'}}(x_i),sign(M_{\theta}(x_i)))$$
+The behavior of self-training when run on infinite unlabeled data from a probability distribution $P$ can be described as 
+$$ST(\theta, S) = \underset{\theta^{'} \in \Theta}{argmin} \underset{X \sim P}{\mathbb{E}} [l(M_{\theta^{'}}(X),sign(M_{\theta}(X)))]$$
+
+**Baseline methods:**
+- Non-adaptive baseline: Directly use $\theta_0$ on the target domain. It will incur error $Err(\theta_0, P_T)$.
+- Direct adaptation to target baseline: Take the source model $\theta_0$ and self-trains on the target data $S_T$, and is denoted by $ST(\theta_0, S_T)$.
+- Gradual self-training: In gradual self-training, we self-train on the finite unlabeled examples from each domain successively. That is, for $i\geq 1$, we set:
+$$\theta_i = ST(\theta_{i-1},S_i)$$
+$ST(\theta_0,(S_1,...,S_Y)) = \theta_T$ is the output of gradual self-training, which we evaluate on the target distribution $P_T$.
+## Assumption
+- Models: Consider regularized linear models that have weights with bounded $l_2$ norm: $\Theta_R = (w,b):\lbrace w\in R^{d} , b\in R , \lVert w \rVert_2 \leq R \rbrace$ for some fixed $R > 0$. Given $(w,b) \in \Theta_R$, the model's output is $M_{w,b}(x) = w^T x+b$.
+- Margin Loss function:  A margin loss encourages a model to classify points correctly and confidently by keeping correctly classified points far from the decision boundary. Consider the hinge loss $h$ and ramp loss $r$:
+$$h(m) = max(1-m,0)$$$$r(m) = min(h(m),1)$$
+In our experiment, we take ramp loss as the loss function: $l_r (\hat{y},y)=r(y\hat{y})$, where $\hat{y} \in R$ is a model's prediction, and $y\in \lbrace -1,1\rbrace$ is the true label. We denote the population ramp loss as:
+$$L_r(\theta,P) = \underset{X,Y \sim P}{\mathbb{E}}[l_r(M_{\theta}(X),Y)]$$
+Given a finite sample $S$, the empirical loss is:
+$$L_r(\theta,S) = \frac{1}{|S|} \underset{x,y\in S}{\sum}[l_r(M_{\theta}(x),y)]$$
+- Distributional distance: Consider the Wasserstein-infinity distance($W_{\infty}$) as the distributional distance. It computes the distance between distributions. Intuitively, $W_{\infty}$ moves points from distribution $P$ to $Q$ by distance at most $\epsilon$ to match the distributions. Formally, given probability measures $P,Q$ on $\chi$:
+$$W_{\infty}(P,Q) = inf(\underset{x\in R^d}{sup} \lVert f(x) - x\rVert_2: f:R^d->R^d, f_{push forward}P=Q)$$
+In our case, we require that the conditional distributions do not shift too much. Given joint probability measures $P,Q$ on the inputs and labels $R^d \times \lbrace -1,1\rbrace$, the distance is:
+$$\rho(P,Q) = max(W_{\infty}(P_{X|Y=1},Q_{X|Y=1}), W_{\infty}(P_{X|Y=-1},Q_{X|Y=-1}))$$
+- $\alpha^{\*}$-separation assumption: Assume every domain admits a classifier with low loss $\alpha^{\*}$, that is there exists $\alpha^{\*} \geq 0$ and for every domain $P_t$, there exists some $\theta_t\in\Theta_R$ with $L_r(\theta_t,P_t) \leq \alpha^{\*}$.
+- Bounded data assumption: Data is not too large on average: $\underset{x\sim P}{\mathbb{E}} [\lVert X\rVert_2^2] \leq B^2$, where $B >0$.
+- No label shift assumption: Assume that the fraction of $Y=1$ labels does not change:$P_t(Y)$ is the same for all $t$.
 ## Essential Findings
+- Direct adaptation baseline fails: Even under that $\alpha^{\*}$-separation, no label shift, gradual shift, and bounded data assumptions, there exists distributions $P_0,P_1,P_2$ and a source model $\theta \in \Theta_R$ that get $0$ loss on the source $(L_r(\theta,P_0)=0)$, but high loss on the target: $L_r(\theta,P_2) = 1$. Self-training directly on the target does not help: $L_r(ST(\theta,P_2),P_2) = 1$. This holds true even if every domain is separable, so $\alpha^{\*} = 0$ .
+- Gradual self-training improves error: Given $P,Q$ with $\rho(P,Q) = \rho < \frac{1}{R}$ and marginals on $Y$ are the same so $P(Y) = Q(Y)$. Suppose $P,Q$ satisfy the bounded data assumption, and we have initial model $\theta$, and $n$ unlabeled samples $S$ from $Q$, and we set $\theta^{'}= ST(\theta,S)$. Then with probability at least $1-\delta$ over the sampling of $S$, letting $\alpha^{\*} = min_{\theta^{\*} \in \Theta_R} L_r(\theta^{\*},Q)$:
+$$L_r(\theta^{'},Q) \leq \frac{2}{1-\rho R}L_r(\theta,P)+\alpha^{\*}+\frac{4BR+\sqrt{2\log2/\delta}}{\sqrt{n}}$$
 
 # 3. Experiments
 ## Datasets
+- **Gaussian:** Synthetic dataset where the distribution $P_t(X|Y )$for each of two classes is a ddimensional Gaussian, where $d = 100$. The means and covariances of each class vary over time. The model gets $500$ labeled samples from the source domain, and $500$ unlabeled samples from each of $10$ intermediate domains. This dataset resembles our Gaussian setting but the covariance matrices are not isotropic, and the number of labeled and unlabeled samples is finite and on the order of the dimension $d$.
+- **Rotating MNIST:** Rotating MNIST is a semi-synthetic dataset where we rotate each MNIST image by an angle between $0$ and $60$ degrees. We split the $50,000$ MNIST training set images into a source domain (images rotated between $0$ and $5$ degrees), intermediate domain (rotations between $5$ and $60$ degrees), and a target domain (rotations between $55$ degrees and $60$ degrees). Note that each image is seen at exactly one angle, so the training procedure cannot track a single image across different angles.
+- **Portraits:** A real dataset comprising photos of high school seniors across years. The model’s goal is to classify gender. We split the data into a source domain (first 2000 images), intermediate domain (next 14000 images), and target domain (next 2000 images).
 ## Results
+
 # 4. Discussion
 # 5. Conclusion
 # 6. Reference
