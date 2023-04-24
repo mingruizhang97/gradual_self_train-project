@@ -14,7 +14,7 @@ We prove the first non-vacuous upper bound on the error of self-training with gr
 
 Domain adaptation is a special case of transfer learning. Transfer learning refers to a class of machine learning problems where either the tasks and/or domains may change between source and target while in domain adaptations only domains differ and tasks remain unchanged.[1]
 <p align="center">
-<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/domain_adaptation%20graph.jpg" width = '400' height = '300'>
+<img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/domain_adaptation%20graph.jpg" width = '600' height = '400'>
 </p>
 
 
