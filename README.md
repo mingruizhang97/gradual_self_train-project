@@ -66,15 +66,26 @@ $$\rho(P,Q) = max(W_{\infty}(P_{X|Y=1},Q_{X|Y=1}), W_{\infty}(P_{X|Y=-1},Q_{X|Y=
 - **Bounded data assumption:** Data is not too large on average: $\underset{x\sim P}{\mathbb{E}} [\lVert X\rVert_2^2] \leq B^2$, where $B >0$.
 - **No label shift assumption:** Assume that the fraction of $Y=1$ labels does not change:$P_t(Y)$ is the same for all $t$.
 ## Essential Findings
-- **Direct adaptation baseline fails:**
+### **Direct adaptation baseline fails:**
 Even under that $\alpha^{\*}$-separation, no label shift, gradual shift, and bounded data assumptions, there exists distributions $P_0,P_1,P_2$ and a source model $\theta \in \Theta_R$ that get $0$ loss on the source $(L_r(\theta,P_0)=0)$, but high loss on the target: $L_r(\theta,P_2) = 1$. Self-training directly on the target does not help: $L_r(ST(\theta,P_2),P_2) = 1$. This holds true even if every domain is separable, so $\alpha^{\*} = 0$ .
-- **Gradual self-training improves error:** 
+### **Gradual self-training improves error:** 
 Given $P,Q$ with $\rho(P,Q) = \rho < \frac{1}{R}$ and marginals on $Y$ are the same so $P(Y) = Q(Y)$. Suppose $P,Q$ satisfy the bounded data assumption, and we have initial model $\theta$, and $n$ unlabeled samples $S$ from $Q$, and we set $\theta^{'}= ST(\theta,S)$. Then with probability at least $1-\delta$ over the sampling of $S$, letting $\alpha^{\*} = min_{\theta^{\*} \in \Theta_R} L_r(\theta^{\*},Q)$:
 $$L_r(\theta^{'},Q) \leq \frac{2}{1-\rho R}L_r(\theta,P)+\alpha^{\*}+\frac{4BR+\sqrt{2\log2/\delta}}{\sqrt{n}}$$
 Under the $\alpha^{\*}$-separation, no label shift, gradual shift, and bounded data assumptions, if the source model $\theta_0$ has low loss $\alpha_0 \geq \alpha^{\*}$ on $P_0$ and $\theta$ is the result of gradual self-training: $\theta = ST(\theta_0,(S_1,...,S_n))$, letting $\beta = \frac{2}{1-\rho R}$:
 $$L_r(\theta,P_T) \leq \beta^{T+1}(\alpha_0+\frac{4BR+\sqrt{2\log2T/\delta}}{\sqrt{n}})$$ 
 Even under the $\alpha^{\*}$-separation, no label shift, gradual shift, and bounded data assumptions, given $0 \leq \alpha_0 \leq \frac{1}{4}$, for every $T$ there exists distributions $P_0,..., P_{2T}$, and $\theta_0 \in \Theta_R$ with $L_r(\theta_0,P_0) \leq \alpha^{\*}$, but if $\theta^{'} = ST(\theta_0,(P1,...,P_{2T}))$ then $L_r(\theta^{'},P_{2T}) \geq min(0.5, \frac{1}{2}2^T \alpha_0)$. Note that $L_r$ is always in $[0,1]$.
 
+### **Essential ingredients for gradual self-training:**
+- **Regularization:**
+If we self-train without regularization, the optimal model for the pseudolabeled dataset is the original model since the original model gives the pseudolabel to this unlabeled dataset. More specific to our setting, our bounds require regularized models because regularized models classify the data correctly with a margin, so even after a mild distribution shift we get most new examples correct. Note that in traditional supervised learning, regularization is usually required when we have few examples for better generalization to the population, whereas in our setting regularization is important for maintaining a margin even with infinite data.
+- **Label sharpening:**
+In our setting, we pseufolabel examples as $-1$ or $1$ ("hard" labels), based on the output of the classifier, which consider as label sharpening. Some previous work uses "soft" labels, where for each example they assign a probability of the label being  $-1$ or $1$, and train using a logistic loss. Self-traning then picks the model which optimizes the logistic loss. However, this form of self-training may never update the parameters the original model minimizes the logistic loss. This suggests that we "sharpen" the soft labels to encourage the model to update its parameters.
+- **Ramp loss versus hinge loss:**
+Although hinge loss is very popular and tends to work better in practice since it is easier to optimize and is convex for linear models, it is not suitable to be a loss function  in our case. In the paper, they analyze that we cannot control the error of gradual self-training with the hinge loss even if we had infinite examples, so the ramp loss is important to get loss upper bounded.
+- **Self-training won't improve the performance without domain shift:**
+If we have no distribution shift ($P_0=...=P_T$), the error can only grow linearly. Given a classifier with loss $\alpha_0$, if we do gradual self-training the loss is at most $\alpha_0 T$. Formally:
+Given $\alpha_0 > 0$, distributions $P_0 =...=P_T$, and model $\theta_0 \in \Theta_R$ with $L_r(\theta_0,P_0) \leq \alpha_0$, $L_r(\theta^{'},P_T) \leq \alpha_0(T+1)$ where $\theta^{'} = ST(\theta_0,(P_1,...,P_T))$.
+However, if we use non-adaptive baseline under this case, it only has error $\alpha_0$. Therefore, self-training will not outperform when there is no domain shift.
 
 
 
