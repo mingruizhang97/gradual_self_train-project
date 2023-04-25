@@ -8,6 +8,14 @@ Machine learning systems must adapt to data distributions that evolve over time,
 
 We prove the first non-vacuous upper bound on the error of self-training with gradual shifts, under settings where directly adapting to the target domain can result in unbounded error. The theoretical analysis leads to algorithmic insights, highlighting that regularization and label sharpening are essential even when we have infinite data, and suggesting that self-training works particularly well for shifts with small Wasserstein-infinity distance. Leveraging the gradual shift structure leads to higher accuracies on a rotating MNIST dataset and a realistic Portraits dataset.
 
+- [1. Overview](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#1-overview)
+- [2. Theoretical Analysis](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#2-theoretical-analysis)
+- [3. Experiments](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#3-experiments)
+- [4. My little experiment project](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#4-my-little-experiment-project)
+- [5. Discussion](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#4-my-little-experiment-project)
+- [6. Conclusion](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#6-conclusion)
+- [7. Reference](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#7-reference)
+
 # 1. Overview
 
 ## What is Domain Adaptation?
@@ -22,7 +30,7 @@ Domain adaptation is a special case of transfer learning. Transfer learning refe
 ## What is Self-training?
 **Self-training**, which is also known as self-learning, self-labeling, or decision-directed learning, is probably the earliest idea about using unlabeled data in classification. This is a wrapper-algorithm that repeatedly uses a supervised learning method. It starts by training on the labeled data only. In each step, a part of the unlabeled points is labeled as "pseudolabel" according to the current decision function; then the supervised method is retrained using the previous predictions(pseudolabeled samples)which have been classified with confidence as additional labeled points.[2]
 ## Motivation on Self-training for Gradual Domain Adaptation
-Traditional machine learning aims to learn a model on a set of training samples to find an objective function with minimum risk on unseen test data. However, it assumes that both training and test data are drawn from the same distribution and share similar joint probability distributions. This assumption can be easily violated in the real-world applications.
+Traditional machine learning aims to learn a model on a set of training samples to find an objective function with minimum risk on unseen test data. However, it assumes that both training and test data are drawn from the same distribution and share similar joint probability distributions. This assumption can be easily violated in the real-world applications. For example, sensor measurements drift over time due to sensor aging, self-driving car vision modules have to deal with evolving road conditions, and neural signals received by brain-machine interfaces change within the span of a day. In these examples, the domain shift doesn't happen at one time and repeatedly gathering large sets of labeled examples to retrain the model can be quite time and cost consuming. So we would like to see if self-training for gradual domain adaptation can solve the problem.
 ## Related Work
 Hoffman et al.[3] , Michael et al.[4], Markus et al., Bobu et al.[5] among others propose
 approaches for gradual domain adaptation. This setting differs from online learning,
@@ -70,7 +78,7 @@ In our case, we require that the conditional distributions do not shift too much
 $$\rho(P,Q) = max(W_{\infty}(P_{X|Y=1},Q_{X|Y=1}), W_{\infty}(P_{X|Y=-1},Q_{X|Y=-1}))$$
 - **$\alpha^{\*}$-separation assumption:** Assume every domain admits a classifier with low loss $\alpha^{\*}$, that is there exists $\alpha^{\*} \geq 0$ and for every domain $P_t$, there exists some $\theta_t\in\Theta_R$ with $L_r(\theta_t,P_t) \leq \alpha^{\*}$.
 - **Bounded data assumption:** Data is not too large on average: $\underset{x\sim P}{\mathbb{E}} [\lVert X\rVert_2^2] \leq B^2$, where $B >0$.
-- **No label shift assumption:** Assume that the fraction of $Y=1$ labels does not change:$P_t(Y)$ is the same for all $t$.
+- **No label shift assumption:** Assume that the fraction of $Y=1$ labels does not change: $P_t (Y)$ is the same for all $t$.
 ## Essential Findings
 ### **Direct adaptation baseline fails:**
 Direct adaptation baseline may get high ramp loss on the target domain even if it gets $0$ ramp loss on the source domain. It is because the distribution shift from source $P_0$ to the target $P_T$ can be large though the distribution shift from $P_t$ to $P_{t+1}$ is small. Formally:
@@ -107,7 +115,7 @@ However, if we use non-adaptive baseline under this case, it only has error $\al
 ## Datasets
 - **Gaussian:** Synthetic dataset where the distribution $P_t(X|Y )$for each of two classes is a ddimensional Gaussian, where $d = 100$. The means and covariances of each class vary over time. The model gets $500$ labeled samples from the source domain, and $500$ unlabeled samples from each of $10$ intermediate domains. This dataset resembles our Gaussian setting but the covariance matrices are not isotropic, and the number of labeled and unlabeled samples is finite and on the order of the dimension $d$.
 - **Rotating MNIST:** Rotating MNIST is a semi-synthetic dataset where we rotate each MNIST image by an angle between $0$ and $60$ degrees. We split the $50,000$ MNIST training set images into a source domain (images rotated between $0$ and $5$ degrees), intermediate domain (rotations between $5$ and $60$ degrees), and a target domain (rotations between $55$ degrees and $60$ degrees). Note that each image is seen at exactly one angle, so the training procedure cannot track a single image across different angles.
-- **Portraits:** A real dataset comprising photos of high school seniors across years. The model’s goal is to classify gender. We split the data into a source domain (first 2000 images), intermediate domain (next 14000 images), and target domain (next 2000 images).
+- **Portraits:** A real dataset comprising photos of high school seniors across years. The model’s goal is to classify gender. We split the data into a source domain (first $2000$ images), intermediate domain (next $14000$ images), and target domain (next $2000$ images).
 ## Results
 Models are evaluated on **classification accuracy**.
 ### Results on different self-training methods
@@ -138,7 +146,7 @@ Models are evaluated on **classification accuracy**.
 The goal is to get high accuracy on $P_{20}$: these images rotated by $60$ degrees—the model doesn’t have to generalize to unseen images, but to seen images at different angles.
 ### Results on different distributional distance
 They also take total-variant distance as distributional distance instead of Wasserstein-infinity distance. Gradual self-training with total-variant distance gets $33.5 \pm 1.5 \%$ accuracy on the target, while direct adaptation to the target gets $33.0 \pm 2.2\%$ over 5 runs.
-# My little experiment project
+# 4. My little experiment project
 To find out the influence of distributional distance, Wasserstein-infinity distance in this case, I use the same rotating MNIST dataset but change the rotating degree on domains. 
 |                |Source domain rotation |   Intermediate domain rotation                         |Target domain rotation
 |----------------|-------------------------------|-----------------------------|----------|
@@ -172,6 +180,11 @@ New setting1 is to measure the performance of gradual self-training when distrib
 |TARGET ST          |34.23           |       |
 |ALL ST             |39.70|
 |GRADUAL ST         |87.51|
+
+From the result above, we can find out that when we increase the Wasserstein-infinity distance between distributions, the gradual self-training can still outperform among other methods but has poorer performance compared to that on smaller distance. It is intuitive if we remember that the upper bound of error is related to and has a negative correlation with distributional distance constant $\rho$. Overlap data distribution on the intermediate domain and target domain can have small positive impact on the performance which may lead to less rigorous experiment result.
+
+The original code that I use comes from the github repository of this paper:  https://github.com/p-lambda/gradual_domain_adaptation
+
 # 5. Discussion
 From the above experiments, the model of gradual self-training indeed outperforms the other model methods among all three datasets. Regularization and "hard" labels can both improve the performance of gradual self-training, especially in MNIST dataset. When the dataset has more samples, regularization is still important and model with regularization can have higher accuracy even dataset has more data. It is different from what we have known for traditional supervised machine learning where regularization is used for generalization and its effect may gradually wave when the number of data increases. If they use total-variant distance as distributional distance, the gradual self-training has similar performance as direct adaptation.
 # 6. Conclusion
@@ -190,138 +203,3 @@ To sum up, gradual self-training is a new theory and has a lot of directions to 
 [4] G. Michael, E. Dennis, K. B. Mara, B. Peter, and M. Dorit. Gradual domain adaptation for segmenting whole slide images showing pathological variability. In Image and Signal Processing, 2018.
 
 [5] A. Bobu, E. Tzeng, J. Hoffman, and T. Darrell. Adapting to continuously shifting domains. In International Conference on Learning Representations Workshop (ICLR), 2018.
-
-## Create files and folders
-
-The file explorer is accessible using the button in left corner of the navigation bar. You can create a new file by clicking the **New file** button in the file explorer. You can also create folders by clicking the **New folder** button.
-
-## Switch to another file
-
-All your files and folders are presented as a tree in the file explorer. You can switch from one to another by clicking a file in the tree.
-
-## Rename a file
-
-You can rename the current file by clicking the file name in the navigation bar or by clicking the **Rename** button in the file explorer.
-
-## Delete a file
-
-You can delete the current file by clicking the **Remove** button in the file explorer. The file will be moved into the **Trash** folder and automatically deleted after 7 days of inactivity.
-
-## Export a file
-
-You can export the current file by clicking **Export to disk** in the menu. You can choose to export the file as plain Markdown, as HTML using a Handlebars template or as a PDF.
-
-
-# Synchronization
-
-Synchronization is one of the biggest features of StackEdit. It enables you to synchronize any file in your workspace with other files stored in your **Google Drive**, your **Dropbox** and your **GitHub** accounts. This allows you to keep writing on other devices, collaborate with people you share the file with, integrate easily into your workflow... The synchronization mechanism takes place every minute in the background, downloading, merging, and uploading file modifications.
-
-There are two types of synchronization and they can complement each other:
-
-- The workspace synchronization will sync all your files, folders and settings automatically. This will allow you to fetch your workspace on any other device.
-	> To start syncing your workspace, just sign in with Google in the menu.
-
-- The file synchronization will keep one file of the workspace synced with one or multiple files in **Google Drive**, **Dropbox** or **GitHub**.
-	> Before starting to sync files, you must link an account in the **Synchronize** sub-menu.
-
-## Open a file
-
-You can open a file from **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Open from**. Once opened in the workspace, any modification in the file will be automatically synced.
-
-## Save a file
-
-You can save any file of the workspace to **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Save on**. Even if a file in the workspace is already synced, you can save it to another location. StackEdit can sync one file with multiple locations and accounts.
-
-## Synchronize a file
-
-Once your file is linked to a synchronized location, StackEdit will periodically synchronize it by downloading/uploading any modification. A merge will be performed if necessary and conflicts will be resolved.
-
-If you just have modified your file and you want to force syncing, click the **Synchronize now** button in the navigation bar.
-
-> **Note:** The **Synchronize now** button is disabled if you have no file to synchronize.
-
-## Manage file synchronization
-
-Since one file can be synced with multiple locations, you can list and manage synchronized locations by clicking **File synchronization** in the **Synchronize** sub-menu. This allows you to list and remove synchronized locations that are linked to your file.
-
-
-# Publication
-
-Publishing in StackEdit makes it simple for you to publish online your files. Once you're happy with a file, you can publish it to different hosting platforms like **Blogger**, **Dropbox**, **Gist**, **GitHub**, **Google Drive**, **WordPress** and **Zendesk**. With [Handlebars templates](http://handlebarsjs.com/), you have full control over what you export.
-
-> Before starting to publish, you must link an account in the **Publish** sub-menu.
-
-## Publish a File
-
-You can publish your file by opening the **Publish** sub-menu and by clicking **Publish to**. For some locations, you can choose between the following formats:
-
-- Markdown: publish the Markdown text on a website that can interpret it (**GitHub** for instance),
-- HTML: publish the file converted to HTML via a Handlebars template (on a blog for example).
-
-## Update a publication
-
-After publishing, StackEdit keeps your file linked to that publication which makes it easy for you to re-publish it. Once you have modified your file and you want to update your publication, click on the **Publish now** button in the navigation bar.
-
-> **Note:** The **Publish now** button is disabled if your file has not been published yet.
-
-## Manage file publication
-
-Since one file can be published to multiple locations, you can list and manage publish locations by clicking **File publication** in the **Publish** sub-menu. This allows you to list and remove publication locations that are linked to your file.
-
-
-# Markdown extensions
-
-StackEdit extends the standard Markdown syntax by adding extra **Markdown extensions**, providing you with some nice features.
-
-> **ProTip:** You can disable any **Markdown extension** in the **File properties** dialog.
-
-
-## SmartyPants
-
-SmartyPants converts ASCII punctuation characters into "smart" typographic punctuation HTML entities. For example:
-
-|                |ASCII                          |HTML                         |
-|----------------|-------------------------------|-----------------------------|
-|Single backticks|`'Isn't this fun?'`            |'Isn't this fun?'            |
-|Quotes          |`"Isn't this fun?"`            |"Isn't this fun?"            |
-|Dashes          |`-- is en-dash, --- is em-dash`|-- is en-dash, --- is em-dash|
-
-
-## KaTeX
-
-You can render LaTeX mathematical expressions using [KaTeX](https://khan.github.io/KaTeX/):
-
-The *Gamma function* satisfying $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$ is via the Euler integral
-
-$$
-\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.
-$$
-
-> You can find more information about **LaTeX** mathematical expressions [here](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference).
-
-
-## UML diagrams
-
-You can render UML diagrams using [Mermaid](https://mermaidjs.github.io/). For example, this will produce a sequence diagram:
-
-```mermaid
-sequenceDiagram
-Alice ->> Bob: Hello Bob, how are you?
-Bob-->>John: How about you John?
-Bob--x Alice: I am good thanks!
-Bob-x John: I am good thanks!
-Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.
-
-Bob-->Alice: Checking with John...
-Alice->John: Yes... John, how are you?
-```
-
-And this will produce a flow chart:
-
-```mermaid
-graph LR
-A[Square Rect] -- Link text --> B((Circle))
-A --> C(Round Rect)
-B --> D{Rhombus}
-C --> D
-```
