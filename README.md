@@ -11,9 +11,9 @@ We prove the first non-vacuous upper bound on the error of self-training with gr
 # 1. Overview
 
 ## What is Domain Adaptation?
-**Domain adaptation** is the ability to apply an algorithm trained in one or more "source domains" to a different but related "target domain". It generally seeks to learn a model from a source labeled data that can be generalized to a target domain by minimizing the difference between domain distributions. 
+**Domain adaptation** is the ability to apply an algorithm trained in one or more "source domains" to a different but related "target domain". It generally seeks to learn a model from a source labeled data that can be generalized to an unlabeled target domain by minimizing the difference between domain distributions. The key challenge for domain adaptation theory is when the source and target supports do not overlap, which are typical in the modern high-dimensional regime.
 
-Domain adaptation is a special case of transfer learning. Transfer learning refers to a class of machine learning problems where either the tasks and/or domains may change between source and target while in domain adaptations only domains differ and tasks remain unchanged.[1]
+Domain adaptation is a special case of transfer learning. Transfer learning refers to a class of machine learning problems where either the tasks and/or domains may change between source and target while in domain adaptations only domains differ and tasks remain unchanged.[1] 
 <p align="center">
 <img title="a title" alt="Alt text" src="https://github.com/mingruizhang97/gradual_self_train-project/blob/main/domain_adaptation%20graph.jpg" width = '600' height = '400'>
 </p>
@@ -23,6 +23,11 @@ Domain adaptation is a special case of transfer learning. Transfer learning refe
 **Self-training**, which is also known as self-learning, self-labeling, or decision-directed learning, is probably the earliest idea about using unlabeled data in classification. This is a wrapper-algorithm that repeatedly uses a supervised learning method. It starts by training on the labeled data only. In each step, a part of the unlabeled points is labeled as "pseudolabel" according to the current decision function; then the supervised method is retrained using the previous predictions(pseudolabeled samples)which have been classified with confidence as additional labeled points.[2]
 ## Motivation on Self-training for Gradual Domain Adaptation
 Traditional machine learning aims to learn a model on a set of training samples to find an objective function with minimum risk on unseen test data. However, it assumes that both training and test data are drawn from the same distribution and share similar joint probability distributions. This assumption can be easily violated in the real-world applications.
+## Related Work
+Hoffman et al.[3] , Michael et al.[4], Markus et al., Bobu et al.[5] among others propose
+approaches for gradual domain adaptation. This setting differs from online learning,
+lifelong learning, and concept drift, since we only have unlabeled data from shifted distributions. However most of these work are application or domain-based. To the best of our knowledge, in the paper, the author say that we are the $\textbf{first}$ to develop a theory for gradual domain adaptation, and investigate when and why the gradual structure helps.
+
 # 2. Theoretical Analysis
 ## Problem General Setup
 **Gradually shifting distributions:**
@@ -83,7 +88,7 @@ $$L_r(\theta,P_T) \leq \beta^{T+1}(\alpha_0+\frac{4BR+\sqrt{2\log2T/\delta}}{\sq
 
 - Gradual self-training in this setting is tight even with infinite unlabeled examples. The error still has an exponential growth under this case. Formally:
 Even under the $\alpha^{\*}$-separation, no label shift, gradual shift, and bounded data assumptions, given $0 \leq \alpha_0 \leq \frac{1}{4}$, for every $T$ there exists distributions $P_0,..., P_{2T}$, and $\theta_0 \in \Theta_R$ with $L_r(\theta_0,P_0) \leq \alpha^{\*}$, but if $\theta^{'} = ST(\theta_0,(P1,...,P_{2T}))$ then $L_r(\theta^{'},P_{2T}) \geq min(0.5, \frac{1}{2}2^T \alpha_0)$. Note that $L_r$ is always in $[0,1]$.
-
+In the paper, they suggest that if we want to sub-expotential bounds, we can either make additional assumptions on the data distributions, or devise alternative algorithms to achieve better bounds.
 ### **Essential ingredients for gradual self-training:**
 - **Regularization:**
 If we self-train without regularization, the optimal model for the pseudolabeled dataset is the original model since the original model gives the pseudolabel to this unlabeled dataset. More specific to our setting, our bounds require regularized models because regularized models classify the data correctly with a margin, so even after a mild distribution shift we get most new examples correct. Note that in traditional supervised learning, regularization is usually required when we have few examples for better generalization to the population, whereas in our setting regularization is important for maintaining a margin even with infinite data.
@@ -131,12 +136,60 @@ Models are evaluated on **classification accuracy**.
 
 - Dataset: a rotating MNIST dataset where we increase the sample sizes. The source domain $P_0$ consists of $N \in \lbrace2000, 5000, 20000 \rbrace$ images on MNIST. $P_t$ then consists of these same $N$ images, rotated by angle $3t$, for $0\leq t \leq 20$. 
 The goal is to get high accuracy on $P_{20}$: these images rotated by $60$ degrees—the model doesn’t have to generalize to unseen images, but to seen images at different angles.
-# 4. Discussion
-# 5. Conclusion
-# 6. Reference
+### Results on different distributional distance
+They also take total-variant distance as distributional distance instead of Wasserstein-infinity distance. Gradual self-training with total-variant distance gets $33.5 \pm 1.5 \%$ accuracy on the target, while direct adaptation to the target gets $33.0 \pm 2.2\%$ over 5 runs.
+# My little experiment project
+To find out the influence of distributional distance, Wasserstein-infinity distance in this case, I use the same rotating MNIST dataset but change the rotating degree on domains. 
+|                |Source domain rotation |   Intermediate domain rotation                         |Target domain rotation
+|----------------|-------------------------------|-----------------------------|----------|
+|Original Setting| $0.0-5.0$       | $5.0-60.0$    |$55.0-60.0$
+|New Setting1    | $0.0-10.0$      |$10.0-80.0$  | $80.0-90.0$
+|New Setting2    |$0.0-5.0$| $5.0-55.0$    |$55.0-60.0$
+
+New setting1 is to measure the performance of gradual self-training when distributional distance increases. New setting2 is to measure the whether the overlap degree between intermediate domain and target domain on original setting can improve the performance in some ways which we need to get rid of in the experiment.
+- Result on original setting
+
+|                |Accuracy on target domain(%)                                               |
+|----------------------------------------------|-----------------------------|
+|SOURCE             |    31.90      |
+|TARGET ST          |33.47           |       |
+|ALL ST             |36.94|
+|GRADUAL ST         |88.59|
+- Result on New setting1
+
+|                |Accuracy on target domain(%)                                               |
+|----------------------------------------------|-----------------------------|
+|SOURCE             |    14.70      |
+|TARGET ST          |14.18           |       |
+|ALL ST             |15.46|
+|GRADUAL ST         |60.31|
+
+- Result on New setting2
+
+|                |Accuracy on target domain(%)                                               |
+|----------------------------------------------|-----------------------------|
+|SOURCE             |   33.90      |
+|TARGET ST          |34.23           |       |
+|ALL ST             |39.70|
+|GRADUAL ST         |87.51|
+# 5. Discussion
+From the above experiments, the model of gradual self-training indeed outperforms the other model methods among all three datasets. Regularization and "hard" labels can both improve the performance of gradual self-training, especially in MNIST dataset. When the dataset has more samples, regularization is still important and model with regularization can have higher accuracy even dataset has more data. It is different from what we have known for traditional supervised machine learning where regularization is used for generalization and its effect may gradually wave when the number of data increases. If they use total-variant distance as distributional distance, the gradual self-training has similar performance as direct adaptation.
+# 6. Conclusion
+In this paper, they propose a general theory structure of self-training for gradual domain adaptation. To analyze it in a deeper place, they make more assumptions including defining regularized linear models as base models, ramp loss as loss function, Wasserstein-infinity distance as the distributional distance, etc.  Based on assumptions, they find out that direct adaptation may have a high ramp loss on the target domain even if it gets $0$ ramp loss on the source domain. The ramp loss of gradual self-training is upper bounded. After $T$ steps, the loss has an exponential growth even with infinite unlabeled examples. The gradual self-training has three essential ingredients: regularization, label sharpening and ramp loss. 
+
+Although gradual self-training has better performance compared with other baseline methods, it still has limitations, which need to explore more in the future work. First, in this paper, they only analyze the gradual self-training under binary classification task with linear model. It is still unknown whether gradual self-training can outperform on multi-label classification task and other machine learning model classes. Second, although the error is upper-bounded, it is exponential growth which is expected to be lower in the future. Third, it is unclear the influence on the choice of distributional distance function as small Wasserstein-infinity distance can bring good performance to gradual self-training while gradual self-train with small total-variation distance has no better than direct adaptation. 
+
+To sum up, gradual self-training is a new theory and has a lot of directions to explore and research.
+# 7. Reference
 [1] arXiv:2010.03978:[https://doi.org/10.48550/arXiv.2010.03978](https://doi.org/10.48550/arXiv.2010.03978)
 
 [2] O. Chapelle, A. Zien, and B. Scholkopf. Semi-Supervised Learning. MIT Press, 2006.
+
+[3] J. Hoffman, T. Darrell, and K. Saenko. Continuous manifold based adaptation for evolving visual domains. In Computer Vision and Pattern Recognition (CVPR), 2014.
+
+[4] G. Michael, E. Dennis, K. B. Mara, B. Peter, and M. Dorit. Gradual domain adaptation for segmenting whole slide images showing pathological variability. In Image and Signal Processing, 2018.
+
+[5] A. Bobu, E. Tzeng, J. Hoffman, and T. Darrell. Adapting to continuously shifting domains. In International Conference on Learning Representations Workshop (ICLR), 2018.
 
 ## Create files and folders
 
