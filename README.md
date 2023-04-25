@@ -8,13 +8,13 @@ Machine learning systems must adapt to data distributions that evolve over time,
 
 We prove the first non-vacuous upper bound on the error of self-training with gradual shifts, under settings where directly adapting to the target domain can result in unbounded error. The theoretical analysis leads to algorithmic insights, highlighting that regularization and label sharpening are essential even when we have infinite data, and suggesting that self-training works particularly well for shifts with small Wasserstein-infinity distance. Leveraging the gradual shift structure leads to higher accuracies on a rotating MNIST dataset and a realistic Portraits dataset.
 
-- [1. Overview](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#1-overview)
-- [2. Theoretical Analysis](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#2-theoretical-analysis)
-- [3. Experiments](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#3-experiments)
-- [4. My little experiment project](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#4-my-little-experiment-project)
-- [5. Discussion](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#4-my-little-experiment-project)
-- [6. Conclusion](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#6-conclusion)
-- [7. Reference](https://github.com/mingruizhang97/gradual_self_train-project/edit/main/README.md#7-reference)
+- [1. Overview](https://github.com/mingruizhang97/gradual_self_train-project#1-overview)
+- [2. Theoretical Analysis](https://github.com/mingruizhang97/gradual_self_train-project#2-theoretical-analysis)
+- [3. Experiments](https://github.com/mingruizhang97/gradual_self_train-project#3-experiments)
+- [4. My little experiment project](https://github.com/mingruizhang97/gradual_self_train-project#4-my-little-experiment-project)
+- [5. Discussion](https://github.com/mingruizhang97/gradual_self_train-project#5-discussion)
+- [6. Conclusion](https://github.com/mingruizhang97/gradual_self_train-project#6-conclusion)
+- [7. Reference](https://github.com/mingruizhang97/gradual_self_train-project#7-reference)
 
 # 1. Overview
 
