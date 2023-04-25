@@ -181,7 +181,7 @@ New setting1 is to measure the performance of gradual self-training when distrib
 |ALL ST             |39.70|
 |GRADUAL ST         |87.51|
 
-From the result above, we can find out that when we increase the Wasserstein-infinity distance between distributions, the gradual self-training can still outperform among other methods but has poorer performance compared to that on smaller distance. It is intuitive if we remember that the upper bound of error is related to and has a negative correlation with distributional distance constant $\rho$. Overlap data distribution on the intermediate domain and target domain can have small positive impact on the performance which may lead to less rigorous experiment result.
+From the result above, we can find out that when we increase the Wasserstein-infinity distance between distributions, the gradual self-training can still outperform among other methods but has poorer performance compared to that on smaller distance. It is intuitive if we remember that the upper bound of error is related to and has a negative correlation with distributional distance constant $\rho$. Overlap data distribution on the intermediate domain and target domain can have small positive impact on the performance which may lead to less rigorous experiment result on the original paper.
 
 The original code that I use comes from the github repository of this paper:  https://github.com/p-lambda/gradual_domain_adaptation
 
